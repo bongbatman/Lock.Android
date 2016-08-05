@@ -31,6 +31,7 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.auth0.android.lock.enums.AuthMode;
 import com.auth0.android.lock.events.SocialConnectionEvent;
 import com.auth0.android.lock.utils.json.Strategy;
 import com.auth0.android.lock.views.interfaces.LockWidgetSocial;
@@ -43,6 +44,7 @@ public class SocialView extends LinearLayout implements SocialViewAdapter.Connec
 
     private static final String TAG = SocialView.class.getSimpleName();
     private LockWidgetSocial lockWidget;
+    private SocialViewAdapter adapter;
 
     public SocialView(LockWidgetSocial lockWidget, boolean smallButtons) {
         super(lockWidget.getContext());
@@ -56,7 +58,7 @@ public class SocialView extends LinearLayout implements SocialViewAdapter.Connec
         setGravity(Gravity.CENTER);
         RecyclerView recycler = new RecyclerView(getContext());
         List<Strategy> socialStrategies = lockWidget.getConfiguration().getSocialStrategies();
-        SocialViewAdapter adapter = new SocialViewAdapter(getContext(), socialStrategies);
+        adapter = new SocialViewAdapter(getContext(), socialStrategies);
         adapter.setButtonSize(smallButtons);
         adapter.setCallback(this);
         LayoutManager lm = new GridLayoutManager(getContext(), 1, smallButtons ? HORIZONTAL : VERTICAL, false);
@@ -74,4 +76,13 @@ public class SocialView extends LinearLayout implements SocialViewAdapter.Connec
         lockWidget.onSocialLogin(new SocialConnectionEvent(connectionName));
     }
 
+    /**
+     * Updates the Authentication mode for all the SocialButtons on this view.
+     *
+     * @param mode the new AuthMode.
+     */
+    public void setCurrentMode(@AuthMode int mode) {
+        adapter.setButtonMode(mode);
+        adapter.notifyDataSetChanged();
+    }
 }
